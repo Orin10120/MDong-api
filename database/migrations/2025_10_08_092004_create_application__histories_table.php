@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('application__histories', function (Blueprint $table) {
-            $table->id('application_id');
-            $table->unsignedBigInteger('mahasiswa_id');
-            // $table->unsignedBigInteger('dosen_id'); //Bagian Adrian
+        Schema::create('application_histories', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('student_id');
+            // $table->unsignedBigInteger('lecturer_id'); // Bagian adrian
             $table->string('status')->default('PENDING');
             $table->string('is_pembimbing');
-            $table->timestamp('tanggal_submit');
-            $table->timestamp('tanggal_response')->nullable();
+            $table->timestamp('submission_date');
+            $table->timestamp('response_date')->nullable();
 
-            $table->foreign('mahasiswa_id')->references('mahasiswa_id')->on('mahasiswas')->onDelete('cascade');
+            $table->foreign('student_id')->references('id')->on('students')->onDelete('cascade');
         });
     }
 
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('application__histories');
+        Schema::dropIfExists('application_histories');
     }
 };
