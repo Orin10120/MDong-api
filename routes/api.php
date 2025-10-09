@@ -11,6 +11,6 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 // Lecturers
-Route::apiResource('dosen', LecturerController::class);
-Route::apiResource('topik-interest', TopicController::class);
-Route::apiResource('periode', PeriodController::class);
+Route::apiResource('lecturer', LecturerController::class);
+Route::apiResource('interest-topics', TopicController::class);
+Route::apiResource('period', PeriodController::class);
