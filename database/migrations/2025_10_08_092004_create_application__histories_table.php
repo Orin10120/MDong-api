@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('application_histories', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('student_id');
-            // $table->unsignedBigInteger('lecturer_id'); // Bagian adrian
-            $table->string('status')->default('PENDING');
             $table->string('is_pembimbing');
             $table->timestamp('submission_date');
             $table->timestamp('response_date')->nullable();
+            $table->string('response')->default('PENDING');
+            $table->timestamps();
 
             $table->foreign('student_id')->references('id')->on('students')->onDelete('cascade');
         });
