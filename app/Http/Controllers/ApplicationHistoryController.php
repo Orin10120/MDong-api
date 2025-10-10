@@ -74,22 +74,14 @@ class ApplicationHistoryController extends Controller
             return ResponseFormatter::error(400, $validator->errors());
         }
 
-        $data = [];
-        if ($request->has('student_id')) {
-            $data['student_id'] = $request->student_id;
-        }
-        if ($request->has('is_pembimbing')) {
-            $data['is_pembimbing'] = $request->is_pembimbing;
-        }
-        if ($request->has('submission_date')) {
-            $data['submission_date'] = $request->submission_date;
-        }
-        if ($request->has('response_date')) {
-            $data['response_date'] = $request->response_date;
-        }
-        if ($request->has('response')) {
-            $data['response'] = $request->response;
-        }
+        $data = [
+            'student_id' => $request->student_id,
+            'is_pembimbing' => $request->is_pembimbing,
+            'submission_date' => $request->submission_date,
+            'response_date' => $request->response_date,
+            'response' => $request->response,
+        ];
+
 
         $application_history->update($data);
         return $this->show($application_history->id);
