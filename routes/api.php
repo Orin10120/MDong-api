@@ -8,10 +8,10 @@ use Illuminate\Support\Facades\Route;
 
 
 //Student
-Route::apiResource('student', StudentController::class);
+Route::apiResource('students', StudentController::class);
 
 //project
-Route::apiResource('project', ProjectController::class);
+Route::apiResource('projects', ProjectController::class);
 
 //application history
 Route::apiResource('applications', ApplicationHistoryController::class);
