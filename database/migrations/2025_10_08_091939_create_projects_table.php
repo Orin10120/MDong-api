@@ -12,17 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('projects', function (Blueprint $table) {
-            $table->id('project_id');
-            $table->unsignedBigInteger('mahasiswa_id');
-            $table->string('tipe_proyek');
-            $table->string('nama_proyek');
+            $table->id();
+            $table->unsignedBigInteger('student_id')->unique();
+            $table->string('project_type');
+            $table->string('project_name');
             $table->string('visual_path');
-            $table->string('teknik');
-            $table->string('metode');
+            $table->string('technique');
+            $table->string('method');
             $table->string('material');
-            $table->string('narasi');
+            $table->text('narration');
 
-            $table->foreign('mahasiswa_id')->references('mahasiswa_id')->on('mahasiswas')->onDelete('cascade');
+            $table->foreign('student_id')->references('id')->on('students')->onDelete('cascade');
             $table->timestamps();
         });
     }
