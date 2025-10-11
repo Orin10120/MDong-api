@@ -5,13 +5,17 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\ApplicationHistoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LecturerController;
+use App\Http\Controllers\TopicController;
+use App\Http\Controllers\PeriodController;
 
+Route::get('/user', function (Request $request) {
+    return $request->user();
+})->middleware('auth:sanctum');
 
-//Student
+Route::apiResource('lecturers', LecturerController::class);
+Route::apiResource('topics', TopicController::class);
+Route::apiResource('periods', PeriodController::class);
 Route::apiResource('students', StudentController::class);
-
-//project
 Route::apiResource('projects', ProjectController::class);
-
-//application history
 Route::apiResource('applications', ApplicationHistoryController::class);
