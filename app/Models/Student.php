@@ -25,7 +25,7 @@ class Student extends Model
 
     // one to one relationship with Project
     public function project() {
-        return $this->hasOne(Project::class);
+        return $this->hasMany(Project::class);
     }
 
     // one to many relationship with Application_History
