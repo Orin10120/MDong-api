@@ -16,7 +16,7 @@ class Lecturer extends Model
 
     public function topics()
     {
-        return $this->hasMany(Topic::class);
+        return $this->hasOne(Topic::class);
     }
 
     public function periods()
