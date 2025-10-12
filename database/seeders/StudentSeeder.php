@@ -13,7 +13,7 @@ class StudentSeeder extends Seeder
      */
     public function run(): void
     {
-        for ($i = 1; $i <= 2; $i++) {
+        for ($i = 1; $i <= 4; $i++) {
             Student::create([
                 'name'             => 'Student ' . $i,
                 'student_number'   => 2023000 + $i,
