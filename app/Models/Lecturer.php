@@ -27,6 +27,6 @@ class Lecturer extends Authenticatable
 
     public function applicationHistories()
     {
-        return $this->hasMany(ApplicationHistory::class, 'history_user', 'lecture_id', 'history_id');
+        return $this->belongsToMany(ApplicationHistory::class, 'history_user', 'lecture_id', 'history_id');
     }
 }

@@ -13,8 +13,15 @@ class ApplicationHistoryController extends Controller
      */
     public function index()
     {
-        $application_histories = ApplicationHistory::all();
-        return ResponseFormatter::success($application_histories->pluck('api_response'));
+        $application_histories = ApplicationHistory::with('lecturers')->get();
+
+        $data = $application_histories->map(function ($history) {
+            $response = $history->api_response;
+            $response['lecturers'] = $history->lecturers;
+            return $response;
+        });
+
+        return ResponseFormatter::success($data);
     }
 
     /**
@@ -51,8 +58,12 @@ class ApplicationHistoryController extends Controller
      */
     public function show(string $id)
     {
-        $application_history = ApplicationHistory::findOrFail($id);
-        return ResponseFormatter::success($application_history->api_response);
+        $application_history = ApplicationHistory::with('lecturers')->findOrFail($id);
+
+        $response = $application_history->api_response;
+        $response['lecturers'] = $application_history->lecturers;
+
+        return ResponseFormatter::success($response);
     }
 
     /**
@@ -95,5 +106,36 @@ class ApplicationHistoryController extends Controller
         $application_history = ApplicationHistory::findOrFail($id);
         $application_history->delete();
         return ResponseFormatter::success(null, 'Application history deleted');
+    }
+
+    public function lecturers(string $id)
+    {
+        $application_history = ApplicationHistory::with('lecturers')->findOrFail($id);
+
+        return ResponseFormatter::success($application_history->lecturers);
+    }
+
+     public function attachLecturer(Request $request, string $id)
+    {
+        $validated = $request->validate([
+            'lecturer_id' => 'required|exists:lecturers,id',
+        ]);
+
+        $application_history = ApplicationHistory::findOrFail($id);
+        $application_history->lecturers()->attach($validated['lecturer_id']);
+
+        return ResponseFormatter::success(null, 'Lecturer successfully attached to ApplicationHistory');
+    }
+
+    public function detachLecturer(Request $request, string $id)
+    {
+        $validated = $request->validate([
+            'lecturer_id' => 'required|exists:lecturers,id',
+        ]);
+
+        $application_history = ApplicationHistory::findOrFail($id);
+        $application_history->lecturers()->detach($validated['lecturer_id']);
+
+        return ResponseFormatter::success(null, 'Lecturer successfully detached from ApplicationHistory');
     }
 }
