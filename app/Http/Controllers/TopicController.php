@@ -24,15 +24,27 @@ class TopicController extends Controller
     {
         $validated = $request->validate([
             'lecturer_id' => 'required|exists:lecturers,id',
-            'topic_name' => 'required',
-            'description' => 'nullable',
-            'requirement' => 'nullable',
+            'topic_name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'requirement' => 'nullable|string',
             'limit_supervise' => 'integer|min:0',
             'limit_applied' => 'integer|min:0',
         ]);
 
+        $lecturerHasTopic = Topic::where('lecturer_id', $validated['lecturer_id'])->exists();
+
+        if ($lecturerHasTopic) {
+            return response()->json([
+                'message' => 'This lecturer already has a topic assigned.'
+            ], 400);
+        }
+
         $topic = Topic::create($validated);
-        return response()->json(['message' => 'Topic created', 'data' => $topic], 201);
+
+        return response()->json([
+            'message' => 'Topic created successfully',
+            'data' => $topic
+        ], 201);
     }
 
     /**
