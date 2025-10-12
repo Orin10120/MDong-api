@@ -35,4 +35,9 @@ class ApplicationHistory extends Model
             'response'        => $this->response,
         ];
     }
+
+    public function lecturers()
+    {
+        return $this->belongsToMany(Lecturer::class, 'history_user', 'history_id', 'lecture_id');
+    }
 }

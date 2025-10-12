@@ -4,8 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Lecturer extends Model
+class Lecturer extends Authenticatable
 {
     use HasFactory;
 
@@ -22,5 +23,10 @@ class Lecturer extends Model
     public function periods()
     {
         return $this->hasMany(Period::class);
+    }
+
+    public function applicationHistories()
+    {
+        return $this->belongsToMany(ApplicationHistory::class, 'history_user', 'lecture_id', 'history_id');
     }
 }

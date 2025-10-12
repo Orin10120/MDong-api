@@ -13,7 +13,7 @@ class ApplicationHistoriesSeeder extends Seeder
      */
     public function run(): void
     {
-        for ($i=1; $i <= 2; $i++) {
+        for ($i=1; $i <= 4; $i++) {
             ApplicationHistory::create([
                 'student_id' => $i,
                 'is_pembimbing' => 'PBB-1',
