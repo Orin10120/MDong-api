@@ -4,8 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Student extends Model
+class Student extends Authenticatable
 {
     use HasApiTokens;
 
@@ -21,6 +22,10 @@ class Student extends Model
     'entry_year',
     'social_media_url',
     'status',
+    ];
+
+    protected $hidden = [
+        'password',
     ];
 
     // one to many relationship with Project
