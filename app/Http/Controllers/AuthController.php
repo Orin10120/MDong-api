@@ -33,7 +33,7 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             return ResponseFormatter::success([
-                'nama' => $mahasiswa->name,
+                'user' => $mahasiswa->api_response,
                 'role' => 'mahasiswa',
             ], 'Login successful');
         }
