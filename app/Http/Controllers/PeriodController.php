@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Period;
 
@@ -22,14 +23,31 @@ class PeriodController extends Controller
      */
     public function store(Request $request)
     {
+        $lecturer = Auth::guard('dosen')->user();
+
+        if (!$lecturer) {
+            return response()->json(['message' => 'Unauthorized. Please log in as lecturer.'], 401);
+        }
+
+        if ($lecturer->is_admin !== 'YES') {
+            return response()->json(['message' => 'Forbidden. Only admin lecturers can create periods.'], 403);
+        }
+
         $validated = $request->validate([
-            'lecturer_id' => 'required|exists:lecturers,id',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
         ]);
 
-        $period = Period::create($validated);
-        return response()->json(['message' => 'Period created', 'data' => $period], 201);
+        $period = Period::create([
+            'lecturer_id' => $lecturer->id,
+            'start_date' => $validated['start_date'],
+            'end_date' => $validated['end_date'],
+        ]);
+
+        return response()->json([
+            'message' => 'Period created successfully',
+            'data' => $period->load('lecturer')
+        ], 201);
     }
 
     /**
@@ -50,13 +68,32 @@ class PeriodController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $lecturer = Auth::guard('dosen')->user();
+
+        if (!$lecturer) {
+            return response()->json(['message' => 'Unauthorized. Please log in as lecturer.'], 401);
+        }
+
+        if ($lecturer->is_admin !== 'YES') {
+            return response()->json(['message' => 'Forbidden. Only admin lecturers can update periods.'], 403);
+        }
+
         $period = Period::find($id);
         if (!$period) {
             return response()->json(['message' => 'Period not found'], 404);
         }
 
-        $period->update($request->all());
-        return response()->json(['message' => 'Period updated', 'data' => $period], 200);
+        $validated = $request->validate([
+            'start_date' => 'sometimes|date',
+            'end_date' => 'sometimes|date|after:start_date',
+        ]);
+
+        $period->update($validated);
+
+        return response()->json([
+            'message' => 'Period updated successfully',
+            'data' => $period->load('lecturer')
+        ], 200);
     }
 
     /**
@@ -64,12 +101,23 @@ class PeriodController extends Controller
      */
     public function destroy(string $id)
     {
+        $lecturer = Auth::guard('dosen')->user();
+
+        if (!$lecturer) {
+            return response()->json(['message' => 'Unauthorized. Please log in as lecturer.'], 401);
+        }
+
+        if ($lecturer->is_admin !== 'YES') {
+            return response()->json(['message' => 'Forbidden. Only admin lecturers can delete periods.'], 403);
+        }
+
         $period = Period::find($id);
         if (!$period) {
             return response()->json(['message' => 'Period not found'], 404);
         }
 
         $period->delete();
-        return response()->json(['message' => 'Period deleted'], 200);
+
+        return response()->json(['message' => 'Period deleted successfully'], 200);
     }
 }

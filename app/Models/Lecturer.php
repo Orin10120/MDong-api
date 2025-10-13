@@ -15,7 +15,7 @@ class Lecturer extends Authenticatable
         'phone', 'is_admin', 'study_program'
     ];
 
-    public function topics()
+    public function topic()
     {
         return $this->hasOne(Topic::class);
     }
