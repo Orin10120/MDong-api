@@ -13,8 +13,8 @@ class ApplicationHistoryController extends Controller
      */
     public function index()
     {
-       $application_histories = ApplicationHistory::with(['lecturers', 'student'])->get();
-
+        $application_histories = ApplicationHistory::with(['lecturers.topic', 'student'])->get();
+        
         $data = $application_histories->flatMap(function ($history) {
             return $history->lecturers->map(function ($lecturer) use ($history) {
                 return [
@@ -23,14 +23,16 @@ class ApplicationHistoryController extends Controller
                     'student_name' => $history->student->name,
                     'lecturer_id' => $lecturer->id,
                     'lecturer_name' => $lecturer->name,
+                    'lecturer_code' => $lecturer->code,
+                    'lecturer_topic' => $lecturer->topic ? $lecturer->topic->topic_name : null,
                     'is_pembimbing' => $history->is_pembimbing,
-                    'submission_date' => $history->submission_date,
-                    'response_date' => $history->response_date,
+                    'submission_date' => $history->submission_date->format('d-m-Y'),
+                    'response_date' => $history->response_date ? $history->response_date->format('d-m-Y') : null,
                     'response' => $history->response,
                 ];
             });
         });
-
+        
         return ResponseFormatter::success($data);
     }
 
@@ -68,10 +70,26 @@ class ApplicationHistoryController extends Controller
      */
     public function show(string $id)
     {
-        $application_history = ApplicationHistory::with('lecturers')->findOrFail($id);
+        $application_history = ApplicationHistory::with(['lecturers.topic', 'student'])->findOrFail($id);
 
-        $response = $application_history->api_response;
-        $response['lecturers'] = $application_history->lecturers;
+        $data = $application_history->lecturers->map(function ($lecturer) use ($application_history) {
+            return [
+                'id' => $application_history->id,
+                'student_id' => $application_history->student->id,
+                'student_name' => $application_history->student->name,
+                'lecturer_id' => $lecturer->id,
+                'lecturer_name' => $lecturer->name,
+                'lecturer_code' => $lecturer->code,
+                'lecturer_topic' => $lecturer->topic ? $lecturer->topic->topic_name : null,
+                'is_pembimbing' => $application_history->is_pembimbing,
+                'submission_date' => $application_history->submission_date->format('d-m-Y'),
+                'response_date' => $application_history->response_date ? $application_history->response_date->format('d-m-Y') : null,
+                'response' => $application_history->response,
+            ];
+        });
+
+        // Return single object jika hanya 1 lecturer
+        $response = $data->count() === 1 ? $data->first() : $data;
 
         return ResponseFormatter::success($response);
     }
@@ -103,7 +121,7 @@ class ApplicationHistoryController extends Controller
             'response' => $request->response,
         ];
 
-
+        
         $application_history->update($data);
         return $this->show($application_history->id);
     }
@@ -120,12 +138,29 @@ class ApplicationHistoryController extends Controller
 
     public function lecturers(string $id)
     {
-        $application_history = ApplicationHistory::with('lecturers')->findOrFail($id);
+        $application_history = ApplicationHistory::with('lecturers.topic')->findOrFail($id);
 
-        return ResponseFormatter::success($application_history->lecturers);
+        $lecturers = $application_history->lecturers->map(function ($lecturer) {
+            return [
+                'id' => $lecturer->id,
+                'name' => $lecturer->name,
+                'code' => $lecturer->code,
+                'nip' => $lecturer->nip,
+                'email' => $lecturer->email,
+                'phone' => $lecturer->phone,
+                'study_program' => $lecturer->study_program,
+                'topic' => $lecturer->topic ? [
+                    'id' => $lecturer->topic->id,
+                    'topic_name' => $lecturer->topic->topic_name,
+                    'description' => $lecturer->topic->description,
+                ] : null,
+            ];
+        });
+
+        return ResponseFormatter::success($lecturers);
     }
 
-     public function attachLecturer(Request $request, string $id)
+    public function attachLecturer(Request $request, string $id)
     {
         $validated = $request->validate([
             'lecturer_id' => 'required|exists:lecturers,id',
