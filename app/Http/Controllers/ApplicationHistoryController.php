@@ -13,12 +13,22 @@ class ApplicationHistoryController extends Controller
      */
     public function index()
     {
-        $application_histories = ApplicationHistory::with('lecturers')->get();
+       $application_histories = ApplicationHistory::with(['lecturers', 'student'])->get();
 
-        $data = $application_histories->map(function ($history) {
-            $response = $history->api_response;
-            $response['lecturers'] = $history->lecturers;
-            return $response;
+        $data = $application_histories->flatMap(function ($history) {
+            return $history->lecturers->map(function ($lecturer) use ($history) {
+                return [
+                    'id' => $history->id,
+                    'student_id' => $history->student->id,
+                    'student_name' => $history->student->name,
+                    'lecturer_id' => $lecturer->id,
+                    'lecturer_name' => $lecturer->name,
+                    'is_pembimbing' => $history->is_pembimbing,
+                    'submission_date' => $history->submission_date,
+                    'response_date' => $history->response_date,
+                    'response' => $history->response,
+                ];
+            });
         });
 
         return ResponseFormatter::success($data);
