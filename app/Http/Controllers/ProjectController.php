@@ -11,10 +11,19 @@ class ProjectController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $projects = Project::all();
-        return ResponseFormatter::success($projects->pluck('api_response'));
+        $query = Project::with('student');
+        
+        // Filter JIKA ada parameter student_id
+        if ($request->has('student_id')) {
+            $query->where('student_id', $request->student_id);
+        }
+        
+        // Jika TIDAK ada parameter → ambil semua (seperti Project::all())
+        $projects = $query->get();
+        
+        return ResponseFormatter::success($projects->pluck('api_response')->values());
     }
 
     /**

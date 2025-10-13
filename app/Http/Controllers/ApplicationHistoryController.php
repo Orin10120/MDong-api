@@ -33,7 +33,7 @@ class ApplicationHistoryController extends Controller
             });
         });
         
-        return ResponseFormatter::success($data);
+        return ResponseFormatter::success($data->values()); 
     }
 
     /**
@@ -88,10 +88,7 @@ class ApplicationHistoryController extends Controller
             ];
         });
 
-        // Return single object jika hanya 1 lecturer
-        $response = $data->count() === 1 ? $data->first() : $data;
-
-        return ResponseFormatter::success($response);
+        return ResponseFormatter::success($data->values());
     }
 
     /**
@@ -121,7 +118,7 @@ class ApplicationHistoryController extends Controller
             'response' => $request->response,
         ];
 
-        
+
         $application_history->update($data);
         return $this->show($application_history->id);
     }
@@ -157,7 +154,7 @@ class ApplicationHistoryController extends Controller
             ];
         });
 
-        return ResponseFormatter::success($lecturers);
+        return ResponseFormatter::success($lecturers->values()); 
     }
 
     public function attachLecturer(Request $request, string $id)
