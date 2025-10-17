@@ -14,7 +14,7 @@ class ApplicationHistoryController extends Controller
     public function index()
     {
         $application_histories = ApplicationHistory::with(['lecturers.topic', 'student'])->get();
-        
+
         $data = $application_histories->flatMap(function ($history) {
             return $history->lecturers->map(function ($lecturer) use ($history) {
                 return [
@@ -29,11 +29,14 @@ class ApplicationHistoryController extends Controller
                     'submission_date' => $history->submission_date->format('d-m-Y'),
                     'response_date' => $history->response_date ? $history->response_date->format('d-m-Y') : null,
                     'response' => $history->response,
+                    'students' => [
+                        'name'  => $history->student->name,
+                    ],
                 ];
             });
         });
-        
-        return ResponseFormatter::success($data->values()); 
+
+        return ResponseFormatter::success($data->values());
     }
 
     /**
@@ -154,7 +157,7 @@ class ApplicationHistoryController extends Controller
             ];
         });
 
-        return ResponseFormatter::success($lecturers->values()); 
+        return ResponseFormatter::success($lecturers->values());
     }
 
     public function attachLecturer(Request $request, string $id)

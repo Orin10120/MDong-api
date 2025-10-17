@@ -33,6 +33,9 @@ class ApplicationHistory extends Model
             'submission_date' => $this->submission_date->format('d-m-Y'),
             'response_date'   => $this->response_date ? $this->response_date->format('d-m-Y') : null,
             'response'        => $this->response,
+            'students' => [
+                'name'  => $this->student->name,
+            ],
         ];
     }
 
