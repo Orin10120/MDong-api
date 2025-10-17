@@ -62,15 +62,26 @@ class LecturerController extends Controller
     {
         $lecturer = Lecturer::with(['topic', 'periods', 'applicationHistories'])->find($id);
 
-         if (!$lecturer) {
+        if (!$lecturer) {
             return response()->json(['message' => 'Lecturer not found'], 404);
         }
 
-        $lecturer->topics = $lecturer->topics ?? [];
-        $lecturer->periods = $lecturer->periods ?? [];
-        $lecturer->applicationHistories = $lecturer->applicationHistories ?? [];
-
-        return response()->json($lecturer, 200);
+        return response()->json([
+            'id' => $lecturer->id,
+            'name' => $lecturer->name,
+            'code' => $lecturer->code,
+            'nip' => $lecturer->nip,
+            'username' => $lecturer->username,
+            'email' => $lecturer->email,
+            'phone' => $lecturer->phone,
+            'is_admin' => $lecturer->is_admin,
+            'study_program' => $lecturer->study_program,
+            'created_at' => $lecturer->created_at,
+            'updated_at' => $lecturer->updated_at,
+            'topic' => $lecturer->topic ?? null,
+            'periods' => $lecturer->periods ?? [],
+            'application_histories' => $lecturer->applicationHistories ?? [],
+        ], 200);
     }
 
     /**
