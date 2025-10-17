@@ -15,9 +15,9 @@ class Lecturer extends Authenticatable
         'phone', 'is_admin', 'study_program'
     ];
 
-    public function topics()
+    public function topic()
     {
-        return $this->hasMany(Topic::class);
+        return $this->hasOne(Topic::class);
     }
 
     public function periods()
@@ -27,6 +27,6 @@ class Lecturer extends Authenticatable
 
     public function applicationHistories()
     {
-        return $this->hasMany(ApplicationHistory::class, 'history_user', 'lecture_id', 'history_id');
+        return $this->belongsToMany(ApplicationHistory::class, 'history_user', 'lecture_id', 'history_id');
     }
 }
