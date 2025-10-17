@@ -13,9 +13,44 @@ class LecturerController extends Controller
      */
     public function index()
     {
-        $lecturers = Lecturer::with(['topic', 'periods', 'applicationHistories'])->get();
-        return response()->json($lecturers, 200);
+        $lecturers = Lecturer::with([
+            'topic',
+            'periods',
+            'applicationHistories.student'
+        ])->get();
+
+        $data = $lecturers->map(function ($lecturer) {
+            return [
+                'id' => $lecturer->id,
+                'name' => $lecturer->name,
+                'code' => $lecturer->code,
+                'nip' => $lecturer->nip,
+                'username' => $lecturer->username,
+                'email' => $lecturer->email,
+                'phone' => $lecturer->phone,
+                'is_admin' => $lecturer->is_admin,
+                'study_program' => $lecturer->study_program,
+                'created_at' => $lecturer->created_at,
+                'updated_at' => $lecturer->updated_at,
+                'topic' => $lecturer->topic ?? null,
+                'periods' => $lecturer->periods ?? [],
+                'application_histories' => $lecturer->applicationHistories->map(function ($history) {
+                    $data = $history->toArray();
+
+                    $data['student'] = $history->student ? [
+                        'id' => $history->student->id,
+                        'name' => $history->student->name,
+                        'entry_year' => $history->student->entry_year,
+                    ] : null;
+
+                    return $data;
+                }),
+            ];
+        });
+
+        return response()->json($data, 200);
     }
+
 
     /**
      * Store a newly created resource in storage.
@@ -58,9 +93,13 @@ class LecturerController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+   public function show(string $id)
     {
-        $lecturer = Lecturer::with(['topic', 'periods', 'applicationHistories'])->find($id);
+        $lecturer = Lecturer::with([
+            'topic',
+            'periods',
+            'applicationHistories.student'
+        ])->find($id);
 
         if (!$lecturer) {
             return response()->json(['message' => 'Lecturer not found'], 404);
@@ -80,9 +119,21 @@ class LecturerController extends Controller
             'updated_at' => $lecturer->updated_at,
             'topic' => $lecturer->topic ?? null,
             'periods' => $lecturer->periods ?? [],
-            'application_histories' => $lecturer->applicationHistories ?? [],
+            'application_histories' => $lecturer->applicationHistories->map(function ($history) {
+                $data = $history->toArray();
+
+                $data['student'] = $history->student ? [
+                    'id' => $history->student->id,
+                    'name' => $history->student->name,
+                    'entry_year' => $history->student->entry_year,
+                ] : null;
+
+                return $data;
+            }),
         ], 200);
     }
+
+
 
     /**
      * Update the specified resource in storage.
